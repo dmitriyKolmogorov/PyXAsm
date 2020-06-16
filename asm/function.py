@@ -123,7 +123,7 @@ class Function(object):
             source += output_var._to_str()
 
             # add cpp function
-            exec(f'from __to_str import {output_var._to_str_func()}\nfunc = {output_var._to_str_func()}', globals())
+            exec(f'from asm.__to_str import {output_var._to_str_func()}\nfunc = {output_var._to_str_func()}', globals())
 
             source += func + '\n'
 
@@ -147,7 +147,7 @@ class Function(object):
                 raise TypeError('Input variable can not have a value.')
 
             # add cpp function
-            exec(f'from __from_str import {var._from_str_func()}\nfunc = {var._from_str_func()}', globals())
+            exec(f'from asm.__from_str import {var._from_str_func()}\nfunc = {var._from_str_func()}', globals())
 
             if func not in source:
                 source += func + '\n'
