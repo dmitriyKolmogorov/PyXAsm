@@ -19,7 +19,7 @@ class Register(object):
         if name in Register.__names:
             self.__name = name
         else:
-            raise NameError(f'Register {name} is unknown. Use Register.names() to get all available names for registers.')
+            raise NameError(f'Register {name} is unknown. Use Register.available_registers() to get all available names for registers.')
 
 
     def __str__(self) -> str:
@@ -28,9 +28,16 @@ class Register(object):
         '''
         return self.__name
 
+    
+    def __repr__(self) -> str:
+        '''
+        Returns name of register.
+        '''
+        return self.__name
+
 
     @classmethod
-    def names(cls):
+    def available_registers(cls):
         '''
         Returns list with all available names for registers.
         '''
@@ -38,5 +45,5 @@ class Register(object):
 
 
 # define all registers
-for reg in Register.names():
+for reg in Register.available_registers():
     exec(f'{reg} = Register("{reg}")')

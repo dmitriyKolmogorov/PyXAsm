@@ -1,11 +1,11 @@
 import os
 
-from asm.variables import Variable
+from asm.variable import Variable
 
 class Function(object):
     '''
     The main class of package. This class creates .exe file from commands from asm.instructions and runs it.
-    You need to have gcc.exe in PATH.
+    You need to have g++.exe in PATH.
     '''
 
     def __init__(self, commands):
@@ -45,17 +45,15 @@ class Function(object):
             with open(self.__buffer_file_name + '.txt', 'r') as f:
                 
                 # reading result and converting to Python objects
-                result = tuple(var._to_type()(string) for var, string in zip(self.__output_vars, f.read().split('\n')))
+                if self.__output_var is not None:
+                    result = self.__output_var._to_type()(f.read())
+                else:
+                    result = None
         finally:
             # delete buffer file
             os.remove(self.__buffer_file_name + '.txt')
 
-        if len(result) == 0:
-            return None
-        elif len(result) == 1:
-            return result[0]
-        else:
-            return result
+        return result
 
         
     def __build_asm(self) -> str:
@@ -78,7 +76,7 @@ class Function(object):
         return source
 
     
-    def compile(self, input_vars=None, output_vars=None, local_vars=None) -> None:
+    def compile(self, input_vars=None, output_var=None, local_vars=None, delete_cpp=True) -> None:
         '''
         This method compiles function for later use.
         input_vars, output_vars and local_vars have to be indexable objects.
@@ -90,9 +88,6 @@ class Function(object):
 
         if local_vars is None:
             local_vars = []
-
-        if output_vars is None:
-            output_vars = []
 
         # name for output text file
         self.__buffer_file_name = '1'
@@ -110,35 +105,37 @@ class Function(object):
         # count for indexing in assembly insertion like %i
         count = 0
 
-        # string with input variables for assembly insertion, like : "r" (c, d)
+        # string with input variables for assembly insertion, like : "r"(c), "r"(d)
         input_row = ':'
 
-        # string with output variables for assembly insertion, like : "+r" (c, d)
-        output_row = ': '
+        # string with output variables for assembly insertion, like : "=r" (c, d)
+        output_row = ': "=r"('
 
-        # validate output variables
-        for var in output_vars:
+        if output_var is not None:
 
-            if not isinstance(var, Variable):
-                raise TypeError('One of the output variables is not of type asm.variables.Variable')
+            if not isinstance(output_var, Variable):
+                raise TypeError('Output variable is not of type asm.variable.Variable.')
 
             # set index for variable
-            var._set_index(count) 
+            output_var._set_index(count) 
 
             # add defining of the variable to source
-            source += var._to_str()
+            source += output_var._to_str()
 
             # add cpp function
-            exec(f'from __to_str import {var._to_str_func()}\nfunc = {var._to_str_func()}', globals())
+            exec(f'from __to_str import {output_var._to_str_func()}\nfunc = {output_var._to_str_func()}', globals())
 
-            if func not in source:
-                print(type(func))
-                source += func + '\n'
+            source += func + '\n'
 
             # add variable to output variables list
-            output_row += '"=r"(' + var._name() + '),'
+            output_row += output_var._name() + ')'
+        else:
+            # trash variable for "output"
+            source += 'int a;'
 
-            count += 1
+            output_row += 'a)'
+
+        count += 1
 
         # validate input variables
         for var in input_vars:
@@ -197,14 +194,14 @@ class Function(object):
             # add defining of the variable to source
             source += var._to_str()
 
-        self.__output_vars = output_vars
-        del output_vars
+        self.__output_var = output_var
+        del output_var
 
         # get assembler source
         asm_source = self.__build_asm()
 
         # add row with output variables to assembly insertion
-        asm_source += output_row[:-1] + '\n'
+        asm_source += output_row + '\n'
         del output_row
         del count
 
@@ -223,8 +220,8 @@ class Function(object):
         source += f'f.open("{self.__buffer_file_name + ".txt"}");\n'
 
         # add writing output to buffer file
-        for var in self.__output_vars:
-            source += 'f << ' + var._to_str_output() + ' + \'\\n\';\n'
+        if self.__output_var is not None:
+            source += 'f << ' + self.__output_var._to_str_output() + ' + \'\\n\';\n'
 
         # add closing buffer file
         source += 'f.close();\n'
@@ -233,13 +230,13 @@ class Function(object):
         source += '}'
 
         # create .exe file 
-        self.__create_exe(source)
+        self.__create_exe(source, delete_cpp=delete_cpp)
 
         # now this function is compiled
         self.__is_compiled = True
 
     
-    def __create_exe(self, source:str) -> None:
+    def __create_exe(self, source:str, delete_cpp=True) -> None:
         '''
         This method compiles created .cpp file and deletes .cpp file.
         '''
@@ -249,8 +246,9 @@ class Function(object):
             f.write(source)
 
         # compile .cpp file
-        # with intel assembly syntax and CPP-11
+        # with intel assembly syntax and CPP-17
         os.system(f'g++ -masm=intel -std=c++17  -o {self.__buffer_file_name}.exe {self.__buffer_file_name}.cpp') 
 
         # delete .cpp file
-        # os.remove(self.__buffer_file_name + '.cpp')
+        if delete_cpp:
+            os.remove(self.__buffer_file_name + '.cpp')
