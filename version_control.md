@@ -1,0 +1,92 @@
+# Current version 0.0.1
+
+## v 0.0.1
+Available instructions:
+-AND
+-NOT
+-OR
+-adc
+-add
+-bsf
+-bsr
+-bt
+-btc
+-btr
+-bts
+-cbw
+-cmp
+-cwd
+-dec
+-div
+-idiv
+-inc
+-je
+-jg
+-jl
+-jmp
+-mov
+-mul
+-sal
+-sar
+-sbb
+-shl
+-shr
+-sub
+-xchg
+-xor
+
+Available registers:
+-ah
+-al
+-ax
+-eax
+-dh
+-dl
+-dx
+-edx
+-ch
+-cl
+-cx
+-ecx
+-bh
+-bl
+-bx
+-ebx
+-bp
+-ebp
+-si
+-esi
+-di
+-edi
+-sp
+-esp
+-mmx0
+-mmx1
+-mmx2
+-mmx3
+-mmx4
+-mmx5
+-mmx6
+-mmx7
+
+Available types:
+-int
+-short int
+-unsigned short int
+-unsigned int
+-long int
+-unsigned long int
+-long long int
+-unsigned long long int
+-int[]
+-short int[]
+-unsiged short int[]
+-unsigned int[]
+-long int[]
+-unsigned long int[]
+-long long int[]
+-unsigned long long int[]
+-float
+-double
+-float[]
+-double[]
