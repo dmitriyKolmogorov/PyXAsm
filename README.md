@@ -4,7 +4,7 @@ This project will help you to learn Assembler and run its source using Python.
 
 It is assumed that the user is a student who studies assembler and doesn't want to understand various syntaxes and compilers, because you can use this libary using CPython.
 
-You should to install GCC and add g++.exe compiler to PATH.
+You should install GCC and add g++.exe compiler to PATH.
 
 ## asm.registers
 To use register, import it from `asm.registers` and use in instructions.
