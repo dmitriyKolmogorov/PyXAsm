@@ -42,7 +42,7 @@ If you want to create variable with type 'int' and with value equal to 5, you so
 ```python
 from asm.variable import Variable
 
-a = Variable(dtype='int', value=1)
+a = Variable(dtype='int', value=5)
 ```
 
 To get all available types use class-method Variable.available_types():
